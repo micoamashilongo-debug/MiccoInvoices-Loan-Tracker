@@ -3,9 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="manifest" href="manifest.json">
+
+<link rel="manifest" href="manifest.json">
+
 <title>MiccoInvoices Loan Tracker</title>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
 
 * {
@@ -104,7 +108,7 @@ header p {
 
 .actions {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 12px;
     margin-bottom: 25px;
 }
@@ -253,7 +257,8 @@ th {
 .customer-section,
 .loan-section,
 .payment-section,
-.reminder-section {
+.reminder-section,
+.history-section {
     display: none;
 }
 
@@ -268,6 +273,68 @@ th {
     font-size: 18px;
 }
 
+/* LOAN HISTORY */
+
+.history-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.history-control {
+    background: #f9fafb;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.history-control label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 7px;
+}
+
+.history-control select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 7px;
+    font-size: 15px;
+    background: white;
+}
+
+.history-summary {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.history-card {
+    background: #f9fafb;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.history-card h4 {
+    color: #6b7280;
+    font-size: 13px;
+    margin-bottom: 7px;
+}
+
+.history-card strong {
+    font-size: 20px;
+}
+
+.no-history {
+    text-align: center;
+    padding: 30px;
+    color: #6b7280;
+    background: #f9fafb;
+    border-radius: 10px;
+}
+
 footer {
     text-align: center;
     color: #6b7280;
@@ -275,11 +342,15 @@ footer {
     font-size: 13px;
 }
 
-@media (max-width: 800px) {
+@media (max-width: 900px) {
 
     .summary-grid,
     .stats,
     .actions {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .history-summary {
         grid-template-columns: repeat(2, 1fr);
     }
 }
@@ -292,7 +363,9 @@ footer {
 
     .summary-grid,
     .stats,
-    .actions {
+    .actions,
+    .history-controls,
+    .history-summary {
         grid-template-columns: 1fr;
     }
 
@@ -305,10 +378,13 @@ footer {
     }
 }
 
-
 </style>
 </head>
+
 <body>
+
+<!-- LOGIN -->
+
 <div id="loginScreen" style="
     max-width: 450px;
     margin: 80px auto;
@@ -365,8 +441,11 @@ footer {
             color:#b91c1c;
         ">
     </p>
+
 </div>
 
+
+<!-- APP -->
 
 <div class="container" id="appContainer" style="display:none;">
 
@@ -374,10 +453,27 @@ footer {
 
 <h1>MICCOINVOICES LOAN TRACKER</h1>
 
-<p>Welcome, Seller <button onclick="logoutSeller()" style="margin-left:15px;padding:8px 14px;background:#b91c1c;">Logout</button></p>
+<p>
+Welcome, Seller
+
+<button
+    onclick="logoutSeller()"
+    style="
+        margin-left:15px;
+        padding:8px 14px;
+        background:#b91c1c;
+    ">
+
+Logout
+
+</button>
+
+</p>
 
 </header>
 
+
+<!-- COMPANY -->
 
 <div class="company">
 
@@ -518,6 +614,10 @@ Record Payment
 
 <button onclick="showReminders()">
 🔔 Reminders
+</button>
+
+<button onclick="showLoanHistory()">
+📅 Loan History
 </button>
 
 </div>
@@ -749,7 +849,6 @@ Cancel
 <div class="form-container" id="paymentForm">
 
 <h2>Record Payment</h2>
-
 
 <div class="form-group">
 
@@ -1063,6 +1162,157 @@ RECENT PAYMENTS
 </div>
 
 
+<!-- LOAN HISTORY -->
+
+<div
+class="table-container history-section"
+id="historySection">
+
+<h2 class="section-title">
+📅 LOAN HISTORY
+</h2>
+
+<p style="color:#6b7280; margin-bottom:18px;">
+View loans issued month by month from January to December.
+</p>
+
+
+<div class="history-controls">
+
+<div class="history-control">
+
+<label for="historyYear">
+Year
+</label>
+
+<select
+id="historyYear"
+onchange="displayLoanHistory()">
+</select>
+
+</div>
+
+
+<div class="history-control">
+
+<label for="historyMonth">
+Month
+</label>
+
+<select
+id="historyMonth"
+onchange="displayLoanHistory()">
+
+<option value="0">
+January
+</option>
+
+<option value="1">
+February
+</option>
+
+<option value="2">
+March
+</option>
+
+<option value="3">
+April
+</option>
+
+<option value="4">
+May
+</option>
+
+<option value="5">
+June
+</option>
+
+<option value="6">
+July
+</option>
+
+<option value="7">
+August
+</option>
+
+<option value="8">
+September
+</option>
+
+<option value="9">
+October
+</option>
+
+<option value="10">
+November
+</option>
+
+<option value="11">
+December
+</option>
+
+</select>
+
+</div>
+
+</div>
+
+
+<div class="history-summary">
+
+<div class="history-card">
+
+<h4>LOANS ISSUED</h4>
+
+<strong id="historyLoanCount">
+0
+</strong>
+
+</div>
+
+
+<div class="history-card">
+
+<h4>TOTAL LENT</h4>
+
+<strong id="historyTotalLent">
+N$ 0.00
+</strong>
+
+</div>
+
+
+<div class="history-card">
+
+<h4>TOTAL PAID</h4>
+
+<strong id="historyTotalPaid">
+N$ 0.00
+</strong>
+
+</div>
+
+
+<div class="history-card">
+
+<h4>OUTSTANDING</h4>
+
+<strong id="historyOutstanding">
+N$ 0.00
+</strong>
+
+</div>
+
+</div>
+
+
+<div id="historyContent">
+
+</div>
+
+</div>
+
+
 <footer>
 
 © 2026 MiccoInvoices Loan Tracker
@@ -1074,52 +1324,185 @@ RECENT PAYMENTS
 
 <script>
 
-const SUPABASE_URL = "https://iagwijsdrttyxdtlfmem.supabase.co";
-const SUPABASE_KEY = "sb_publishable_Hm2xhD-nQW3jhzsvqPwJzQ_U2oG5kbZ";
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const SUPABASE_URL =
+"https://iagwijsdrttyxdtlfmem.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_Hm2xhD-nQW3jhzsvqPwJzQ_U2oG5kbZ";
+
+const supabaseClient =
+window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+
+/* =========================
+LOGIN
+========================= */
 
 async function loginSeller() {
-  const email = document.getElementById("loginEmail").value.trim();
-  const password = document.getElementById("loginPassword").value;
-  const message = document.getElementById("loginMessage");
-  message.textContent = "";
-  if (!email || !password) { message.textContent = "Please enter your email and password."; return; }
-  const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
-  if (error) { message.textContent = error.message; return; }
-  await checkLogin();
+
+    const email =
+        document.getElementById("loginEmail").value.trim();
+
+    const password =
+        document.getElementById("loginPassword").value;
+
+    const message =
+        document.getElementById("loginMessage");
+
+    message.textContent = "";
+
+    if (!email || !password) {
+
+        message.textContent =
+            "Please enter your email and password.";
+
+        return;
+
+    }
+
+    const { error } =
+        await supabaseClient.auth.signInWithPassword({
+            email,
+            password
+        });
+
+    if (error) {
+
+        message.textContent =
+            error.message;
+
+        return;
+
+    }
+
+    await checkLogin();
+
 }
+
 
 async function logoutSeller() {
-  const { error } = await supabaseClient.auth.signOut();
-  if (error) { alert("Logout failed: " + error.message); return; }
-  document.getElementById("appContainer").style.display = "none";
-  document.getElementById("loginScreen").style.display = "block";
+
+    const { error } =
+        await supabaseClient.auth.signOut();
+
+    if (error) {
+
+        alert(
+            "Logout failed: " +
+            error.message
+        );
+
+        return;
+
+    }
+
+    document.getElementById("appContainer")
+        .style.display = "none";
+
+    document.getElementById("loginScreen")
+        .style.display = "block";
+
 }
+
 
 async function setupSellerProfile() {
-  const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
-  if (userError || !user) return;
-  const { data: seller, error } = await supabaseClient.from("sellers").select("*").eq("id", user.id).maybeSingle();
-  if (error) { console.error("Seller profile lookup failed:", error.message); return; }
-  if (!seller) {
-    const { error: insertError } = await supabaseClient.from("sellers").insert({ id: user.id, company_name: "Your Company", contact_info: "Contact Information" });
-    if (insertError) console.error("Seller profile creation failed:", insertError.message);
-  }
+
+    const {
+        data: { user },
+        error: userError
+    } =
+        await supabaseClient.auth.getUser();
+
+    if (userError || !user) return;
+
+    const {
+        data: seller,
+        error
+    } =
+        await supabaseClient
+            .from("sellers")
+            .select("*")
+            .eq("id", user.id)
+            .maybeSingle();
+
+    if (error) {
+
+        console.error(
+            "Seller profile lookup failed:",
+            error.message
+        );
+
+        return;
+
+    }
+
+    if (!seller) {
+
+        const { error: insertError } =
+            await supabaseClient
+                .from("sellers")
+                .insert({
+                    id: user.id,
+                    company_name: "Your Company",
+                    contact_info: "Contact Information"
+                });
+
+        if (insertError) {
+
+            console.error(
+                "Seller profile creation failed:",
+                insertError.message
+            );
+
+        }
+
+    }
+
 }
+
 
 async function checkLogin() {
-  const { data, error } = await supabaseClient.auth.getSession();
-  if (error) { document.getElementById("loginMessage").textContent = error.message; return; }
-  if (data.session) {
-    document.getElementById("loginScreen").style.display = "none";
-    document.getElementById("appContainer").style.display = "block";
-    await setupSellerProfile();
-  } else {
-    document.getElementById("loginScreen").style.display = "block";
-    document.getElementById("appContainer").style.display = "none";
-  }
-}
 
+    const {
+        data,
+        error
+    } =
+        await supabaseClient.auth.getSession();
+
+    if (error) {
+
+        document.getElementById("loginMessage")
+            .textContent =
+            error.message;
+
+        return;
+
+    }
+
+    if (data.session) {
+
+        document.getElementById("loginScreen")
+            .style.display = "none";
+
+        document.getElementById("appContainer")
+            .style.display = "block";
+
+        await setupSellerProfile();
+
+    } else {
+
+        document.getElementById("loginScreen")
+            .style.display = "block";
+
+        document.getElementById("appContainer")
+            .style.display = "none";
+
+    }
+
+}
 
 
 /* =========================
@@ -1130,8 +1513,8 @@ function showCustomerForm() {
 
     hideAllForms();
 
-    document.getElementById("customerForm").style.display =
-        "block";
+    document.getElementById("customerForm")
+        .style.display = "block";
 
     scrollToForm("customerForm");
 
@@ -1140,8 +1523,8 @@ function showCustomerForm() {
 
 function hideCustomerForm() {
 
-    document.getElementById("customerForm").style.display =
-        "none";
+    document.getElementById("customerForm")
+        .style.display = "none";
 
 }
 
@@ -1149,29 +1532,34 @@ function hideCustomerForm() {
 function saveCustomer() {
 
     const name =
-        document.getElementById("customerName").value.trim();
+        document.getElementById("customerName")
+            .value.trim();
 
     const contact =
-        document.getElementById("customerContact").value.trim();
+        document.getElementById("customerContact")
+            .value.trim();
 
     const address =
-        document.getElementById("customerAddress").value.trim();
+        document.getElementById("customerAddress")
+            .value.trim();
 
     const company =
-        document.getElementById("customerCompany").value.trim();
+        document.getElementById("customerCompany")
+            .value.trim();
 
     const companyContact =
-        document.getElementById("companyContact").value.trim();
-
+        document.getElementById("companyContact")
+            .value.trim();
 
     if (!name) {
 
-        alert("Please enter the customer's full name.");
+        alert(
+            "Please enter the customer's full name."
+        );
 
         return;
 
     }
-
 
     const customer = {
 
@@ -1189,30 +1577,32 @@ function saveCustomer() {
 
     };
 
-
     let customers =
-        JSON.parse(localStorage.getItem("miccoCustomers")) || [];
-
+        JSON.parse(
+            localStorage.getItem("miccoCustomers")
+        ) || [];
 
     customers.push(customer);
-
 
     localStorage.setItem(
         "miccoCustomers",
         JSON.stringify(customers)
     );
 
+    document.getElementById("customerName")
+        .value = "";
 
-    document.getElementById("customerName").value = "";
+    document.getElementById("customerContact")
+        .value = "";
 
-    document.getElementById("customerContact").value = "";
+    document.getElementById("customerAddress")
+        .value = "";
 
-    document.getElementById("customerAddress").value = "";
+    document.getElementById("customerCompany")
+        .value = "";
 
-    document.getElementById("customerCompany").value = "";
-
-    document.getElementById("companyContact").value = "";
-
+    document.getElementById("companyContact")
+        .value = "";
 
     hideCustomerForm();
 
@@ -1224,7 +1614,6 @@ function saveCustomer() {
 
     updateDashboard();
 
-
     alert("Customer saved successfully!");
 
 }
@@ -1233,19 +1622,21 @@ function saveCustomer() {
 function displayCustomers() {
 
     const customers =
-        JSON.parse(localStorage.getItem("miccoCustomers")) || [];
-
+        JSON.parse(
+            localStorage.getItem("miccoCustomers")
+        ) || [];
 
     const tableBody =
-        document.getElementById("customerTableBody");
-
+        document.getElementById(
+            "customerTableBody"
+        );
 
     const section =
-        document.getElementById("customerSection");
-
+        document.getElementById(
+            "customerSection"
+        );
 
     tableBody.innerHTML = "";
-
 
     if (customers.length === 0) {
 
@@ -1255,15 +1646,12 @@ function displayCustomers() {
 
     }
 
-
     section.style.display = "block";
-
 
     customers.forEach(customer => {
 
         const row =
             document.createElement("tr");
-
 
         row.innerHTML = `
 
@@ -1289,7 +1677,6 @@ function displayCustomers() {
 
         `;
 
-
         tableBody.appendChild(row);
 
     });
@@ -1300,11 +1687,14 @@ function displayCustomers() {
 function deleteCustomer(id) {
 
     const loans =
-        JSON.parse(localStorage.getItem("miccoLoans")) || [];
-
+        JSON.parse(
+            localStorage.getItem("miccoLoans")
+        ) || [];
 
     if (
-        loans.some(loan => loan.customerId === id)
+        loans.some(
+            loan => loan.customerId === id
+        )
     ) {
 
         alert(
@@ -1315,29 +1705,26 @@ function deleteCustomer(id) {
 
     }
 
-
     if (!confirm("Delete this customer?")) {
 
         return;
 
     }
 
-
     let customers =
-        JSON.parse(localStorage.getItem("miccoCustomers")) || [];
-
+        JSON.parse(
+            localStorage.getItem("miccoCustomers")
+        ) || [];
 
     customers =
         customers.filter(
             customer => customer.id !== id
         );
 
-
     localStorage.setItem(
         "miccoCustomers",
         JSON.stringify(customers)
     );
-
 
     displayCustomers();
 
@@ -1357,8 +1744,9 @@ LOANS
 function showLoanForm() {
 
     const customers =
-        JSON.parse(localStorage.getItem("miccoCustomers")) || [];
-
+        JSON.parse(
+            localStorage.getItem("miccoCustomers")
+        ) || [];
 
     if (customers.length === 0) {
 
@@ -1370,13 +1758,12 @@ function showLoanForm() {
 
     }
 
-
     hideAllForms();
 
     loadCustomerOptions();
 
-    document.getElementById("loanForm").style.display =
-        "block";
+    document.getElementById("loanForm")
+        .style.display = "block";
 
     scrollToForm("loanForm");
 
@@ -1385,8 +1772,8 @@ function showLoanForm() {
 
 function hideLoanForm() {
 
-    document.getElementById("loanForm").style.display =
-        "none";
+    document.getElementById("loanForm")
+        .style.display = "none";
 
 }
 
@@ -1394,27 +1781,25 @@ function hideLoanForm() {
 function loadCustomerOptions() {
 
     const customers =
-        JSON.parse(localStorage.getItem("miccoCustomers")) || [];
-
+        JSON.parse(
+            localStorage.getItem("miccoCustomers")
+        ) || [];
 
     const select =
         document.getElementById("loanCustomer");
 
-
     select.innerHTML =
         '<option value="">Select Customer</option>';
-
 
     customers.forEach(customer => {
 
         const option =
             document.createElement("option");
 
-
         option.value = customer.id;
 
-        option.textContent = customer.name;
-
+        option.textContent =
+            customer.name;
 
         select.appendChild(option);
 
@@ -1427,20 +1812,22 @@ function calculateTotal() {
 
     const amount =
         Number(
-            document.getElementById("loanAmount").value
+            document.getElementById("loanAmount")
+                .value
         ) || 0;
-
 
     const interest =
         Number(
-            document.getElementById("loanInterest").value
+            document.getElementById("loanInterest")
+                .value
         ) || 0;
-
 
     document.getElementById("totalDuePreview")
         .textContent =
         "N$ " +
-        formatMoney(amount + interest);
+        formatMoney(
+            amount + interest
+        );
 
 }
 
@@ -1448,61 +1835,67 @@ function calculateTotal() {
 function saveLoan() {
 
     const customerId =
-        document.getElementById("loanCustomer").value;
-
+        document.getElementById("loanCustomer")
+            .value;
 
     const amount =
         Number(
-            document.getElementById("loanAmount").value
+            document.getElementById("loanAmount")
+                .value
         ) || 0;
 
-
     const issueDate =
-        document.getElementById("issueDate").value;
-
+        document.getElementById("issueDate")
+            .value;
 
     const dueDate =
-        document.getElementById("dueDate").value;
-
+        document.getElementById("dueDate")
+            .value;
 
     const interest =
         Number(
-            document.getElementById("loanInterest").value
+            document.getElementById("loanInterest")
+                .value
         ) || 0;
 
-
     const notes =
-        document.getElementById("loanNotes").value.trim();
-
+        document.getElementById("loanNotes")
+            .value.trim();
 
     if (!customerId) {
 
-        alert("Please select a customer.");
+        alert(
+            "Please select a customer."
+        );
 
         return;
 
     }
-
 
     if (amount <= 0) {
 
-        alert("Please enter a valid loan amount.");
+        alert(
+            "Please enter a valid loan amount."
+        );
 
         return;
 
     }
-
 
     if (!issueDate || !dueDate) {
 
-        alert("Please enter both dates.");
+        alert(
+            "Please enter both dates."
+        );
 
         return;
 
     }
 
-
-    if (new Date(dueDate) < new Date(issueDate)) {
+    if (
+        new Date(dueDate) <
+        new Date(issueDate)
+    ) {
 
         alert(
             "Due date cannot be before issue date."
@@ -1512,18 +1905,19 @@ function saveLoan() {
 
     }
 
-
     const loan = {
 
         id: Date.now(),
 
-        customerId: Number(customerId),
+        customerId:
+            Number(customerId),
 
         amount,
 
         interest,
 
-        totalDue: amount + interest,
+        totalDue:
+            amount + interest,
 
         issueDate,
 
@@ -1535,32 +1929,35 @@ function saveLoan() {
 
     };
 
-
     let loans =
-        JSON.parse(localStorage.getItem("miccoLoans")) || [];
-
+        JSON.parse(
+            localStorage.getItem("miccoLoans")
+        ) || [];
 
     loans.push(loan);
-
 
     localStorage.setItem(
         "miccoLoans",
         JSON.stringify(loans)
     );
 
+    document.getElementById("loanCustomer")
+        .value = "";
 
-    document.getElementById("loanCustomer").value = "";
+    document.getElementById("loanAmount")
+        .value = "";
 
-    document.getElementById("loanAmount").value = "";
+    document.getElementById("issueDate")
+        .value = "";
 
-    document.getElementById("issueDate").value = "";
+    document.getElementById("dueDate")
+        .value = "";
 
-    document.getElementById("dueDate").value = "";
+    document.getElementById("loanInterest")
+        .value = "0";
 
-    document.getElementById("loanInterest").value = "0";
-
-    document.getElementById("loanNotes").value = "";
-
+    document.getElementById("loanNotes")
+        .value = "";
 
     calculateTotal();
 
@@ -1572,7 +1969,6 @@ function saveLoan() {
 
     loadPaymentCustomers();
 
-
     alert("Loan saved successfully!");
 
 }
@@ -1581,23 +1977,26 @@ function saveLoan() {
 function displayLoans() {
 
     const loans =
-        JSON.parse(localStorage.getItem("miccoLoans")) || [];
-
+        JSON.parse(
+            localStorage.getItem("miccoLoans")
+        ) || [];
 
     const customers =
-        JSON.parse(localStorage.getItem("miccoCustomers")) || [];
-
+        JSON.parse(
+            localStorage.getItem("miccoCustomers")
+        ) || [];
 
     const tableBody =
-        document.getElementById("loanTableBody");
-
+        document.getElementById(
+            "loanTableBody"
+        );
 
     const section =
-        document.getElementById("loanSection");
-
+        document.getElementById(
+            "loanSection"
+        );
 
     tableBody.innerHTML = "";
-
 
     if (loans.length === 0) {
 
@@ -1607,53 +2006,55 @@ function displayLoans() {
 
     }
 
-
     section.style.display = "block";
-
 
     loans.forEach(loan => {
 
         const customer =
             customers.find(
-                c => c.id === loan.customerId
+                c =>
+                    c.id === loan.customerId
             );
-
 
         const customerName =
             customer
                 ? customer.name
                 : "Unknown";
 
-
-        const payments =
-            getLoanPayments(loan);
-
-
         const balance =
             getLoanBalance(loan);
-
 
         const status =
             getLoanStatus(loan);
 
-
         const row =
             document.createElement("tr");
 
-
         row.innerHTML = `
 
-            <td>${escapeHTML(customerName)}</td>
+            <td>
+                ${escapeHTML(customerName)}
+            </td>
 
-            <td>N$ ${formatMoney(loan.amount)}</td>
+            <td>
+                N$ ${formatMoney(loan.amount)}
+            </td>
 
-            <td>N$ ${formatMoney(loan.interest)}</td>
+            <td>
+                N$ ${formatMoney(loan.interest)}
+            </td>
 
-            <td>N$ ${formatMoney(loan.totalDue)}</td>
+            <td>
+                N$ ${formatMoney(loan.totalDue)}
+            </td>
 
-            <td>N$ ${formatMoney(balance)}</td>
+            <td>
+                N$ ${formatMoney(balance)}
+            </td>
 
-            <td>${formatDate(loan.dueDate)}</td>
+            <td>
+                ${formatDate(loan.dueDate)}
+            </td>
 
             <td>
 
@@ -1677,7 +2078,6 @@ function displayLoans() {
 
         `;
 
-
         tableBody.appendChild(row);
 
     });
@@ -1693,11 +2093,11 @@ function getLoanPayments(loan) {
 
     }
 
-
     return loan.payments.reduce(
 
         (total, payment) =>
-            total + Number(payment.amount),
+            total +
+            Number(payment.amount),
 
         0
 
@@ -1725,61 +2125,70 @@ function getLoanStatus(loan) {
     const balance =
         getLoanBalance(loan);
 
-
     if (balance <= 0) {
 
         return {
+
             label: "Paid",
+
             className: "paid"
+
         };
 
     }
-
 
     const today =
         new Date();
 
-
-    today.setHours(0,0,0,0);
-
+    today.setHours(
+        0,0,0,0
+    );
 
     const dueDate =
         new Date(loan.dueDate);
 
-
-    dueDate.setHours(0,0,0,0);
-
+    dueDate.setHours(
+        0,0,0,0
+    );
 
     if (dueDate < today) {
 
         return {
+
             label: "Overdue",
+
             className: "overdue"
+
         };
 
     }
 
-
     const days =
         Math.ceil(
+
             (dueDate - today) /
             (1000 * 60 * 60 * 24)
-        );
 
+        );
 
     if (days <= 7) {
 
         return {
+
             label: "Due Soon",
+
             className: "due"
+
         };
 
     }
 
-
     return {
+
         label: "Active",
+
         className: "active"
+
     };
 
 }
@@ -1793,28 +2202,28 @@ function deleteLoan(id) {
 
     }
 
-
     let loans =
-        JSON.parse(localStorage.getItem("miccoLoans")) || [];
-
+        JSON.parse(
+            localStorage.getItem("miccoLoans")
+        ) || [];
 
     loans =
         loans.filter(
             loan => loan.id !== id
         );
 
-
     localStorage.setItem(
         "miccoLoans",
         JSON.stringify(loans)
     );
-
 
     displayLoans();
 
     displayPayments();
 
     displayReminders();
+
+    displayLoanHistory();
 
     updateDashboard();
 
@@ -1830,8 +2239,9 @@ PAYMENTS
 function showPaymentForm() {
 
     const loans =
-        JSON.parse(localStorage.getItem("miccoLoans")) || [];
-
+        JSON.parse(
+            localStorage.getItem("miccoLoans")
+        ) || [];
 
     if (loans.length === 0) {
 
@@ -1843,19 +2253,15 @@ function showPaymentForm() {
 
     }
 
-
     hideAllForms();
 
     loadPaymentCustomers();
 
+    document.getElementById("paymentForm")
+        .style.display = "block";
 
-    document.getElementById("paymentForm").style.display =
-        "block";
-
-
-    document.getElementById("paymentDate").value =
-        getToday();
-
+    document.getElementById("paymentDate")
+        .value = getToday();
 
     scrollToForm("paymentForm");
 
@@ -1864,8 +2270,8 @@ function showPaymentForm() {
 
 function hidePaymentForm() {
 
-    document.getElementById("paymentForm").style.display =
-        "none";
+    document.getElementById("paymentForm")
+        .style.display = "none";
 
 }
 
@@ -1873,50 +2279,56 @@ function hidePaymentForm() {
 function loadPaymentCustomers() {
 
     const customers =
-        JSON.parse(localStorage.getItem("miccoCustomers")) || [];
-
+        JSON.parse(
+            localStorage.getItem("miccoCustomers")
+        ) || [];
 
     const loans =
-        JSON.parse(localStorage.getItem("miccoLoans")) || [];
-
+        JSON.parse(
+            localStorage.getItem("miccoLoans")
+        ) || [];
 
     const select =
-        document.getElementById("paymentCustomer");
-
+        document.getElementById(
+            "paymentCustomer"
+        );
 
     select.innerHTML =
         '<option value="">Select Customer</option>';
-
 
     const customerIds =
         [...new Set(
 
             loans
-            .filter(
-                loan => getLoanBalance(loan) > 0
-            )
-            .map(
-                loan => loan.customerId
-            )
+                .filter(
+                    loan =>
+                        getLoanBalance(loan) > 0
+                )
+                .map(
+                    loan =>
+                        loan.customerId
+                )
 
         )];
 
-
     customers.forEach(customer => {
 
-        if (customerIds.includes(customer.id)) {
+        if (
+            customerIds.includes(
+                customer.id
+            )
+        ) {
 
             const option =
-                document.createElement("option");
-
+                document.createElement(
+                    "option"
+                );
 
             option.value =
                 customer.id;
 
-
             option.textContent =
                 customer.name;
-
 
             select.appendChild(option);
 
@@ -1924,13 +2336,14 @@ function loadPaymentCustomers() {
 
     });
 
-
-    document.getElementById("paymentLoan").innerHTML =
+    document.getElementById(
+        "paymentLoan"
+    ).innerHTML =
         '<option value="">Select Loan</option>';
 
-
-    document.getElementById("paymentBalance")
-        .textContent =
+    document.getElementById(
+        "paymentBalance"
+    ).textContent =
         "N$ 0.00";
 
 }
@@ -1940,50 +2353,58 @@ function loadPaymentLoans() {
 
     const customerId =
         Number(
-            document.getElementById("paymentCustomer").value
+            document.getElementById(
+                "paymentCustomer"
+            ).value
         );
 
-
     const loans =
-        JSON.parse(localStorage.getItem("miccoLoans")) || [];
-
+        JSON.parse(
+            localStorage.getItem("miccoLoans")
+        ) || [];
 
     const select =
-        document.getElementById("paymentLoan");
-
+        document.getElementById(
+            "paymentLoan"
+        );
 
     select.innerHTML =
         '<option value="">Select Loan</option>';
 
-
     loans.forEach(loan => {
 
         if (
-            loan.customerId === customerId &&
+
+            loan.customerId ===
+            customerId &&
+
             getLoanBalance(loan) > 0
+
         ) {
 
             const option =
-                document.createElement("option");
-
+                document.createElement(
+                    "option"
+                );
 
             option.value =
                 loan.id;
 
-
             option.textContent =
                 "N$ " +
-                formatMoney(loan.totalDue) +
+                formatMoney(
+                    loan.totalDue
+                ) +
                 " | Due " +
-                formatDate(loan.dueDate);
-
+                formatDate(
+                    loan.dueDate
+                );
 
             select.appendChild(option);
 
         }
 
     });
-
 
     showPaymentBalance();
 
@@ -1994,33 +2415,36 @@ function showPaymentBalance() {
 
     const loanId =
         Number(
-            document.getElementById("paymentLoan").value
+            document.getElementById(
+                "paymentLoan"
+            ).value
         );
 
-
     const loans =
-        JSON.parse(localStorage.getItem("miccoLoans")) || [];
-
+        JSON.parse(
+            localStorage.getItem("miccoLoans")
+        ) || [];
 
     const loan =
         loans.find(
-            item => item.id === loanId
+            item =>
+                item.id === loanId
         );
-
 
     if (!loan) {
 
-        document.getElementById("paymentBalance")
-            .textContent =
+        document.getElementById(
+            "paymentBalance"
+        ).textContent =
             "N$ 0.00";
 
         return;
 
     }
 
-
-    document.getElementById("paymentBalance")
-        .textContent =
+    document.getElementById(
+        "paymentBalance"
+    ).textContent =
         "N$ " +
         formatMoney(
             getLoanBalance(loan)
@@ -2033,25 +2457,28 @@ function checkPaymentAmount() {
 
     const loanId =
         Number(
-            document.getElementById("paymentLoan").value
+            document.getElementById(
+                "paymentLoan"
+            ).value
         );
-
 
     const amount =
         Number(
-            document.getElementById("paymentAmount").value
+            document.getElementById(
+                "paymentAmount"
+            ).value
         ) || 0;
 
-
     const loans =
-        JSON.parse(localStorage.getItem("miccoLoans")) || [];
-
+        JSON.parse(
+            localStorage.getItem("miccoLoans")
+        ) || [];
 
     const loan =
         loans.find(
-            item => item.id === loanId
+            item =>
+                item.id === loanId
         );
-
 
     if (!loan) {
 
@@ -2059,14 +2486,14 @@ function checkPaymentAmount() {
 
     }
 
-
     const balance =
         getLoanBalance(loan);
 
-
     if (amount > balance) {
 
-        document.getElementById("paymentAmount").value =
+        document.getElementById(
+            "paymentAmount"
+        ).value =
             balance;
 
         alert(
@@ -2082,101 +2509,113 @@ function savePayment() {
 
     const customerId =
         Number(
-            document.getElementById("paymentCustomer").value
+            document.getElementById(
+                "paymentCustomer"
+            ).value
         );
-
 
     const loanId =
         Number(
-            document.getElementById("paymentLoan").value
+            document.getElementById(
+                "paymentLoan"
+            ).value
         );
-
 
     const amount =
         Number(
-            document.getElementById("paymentAmount").value
+            document.getElementById(
+                "paymentAmount"
+            ).value
         ) || 0;
 
-
     const date =
-        document.getElementById("paymentDate").value;
-
+        document.getElementById(
+            "paymentDate"
+        ).value;
 
     const method =
-        document.getElementById("paymentMethod").value;
-
+        document.getElementById(
+            "paymentMethod"
+        ).value;
 
     const notes =
-        document.getElementById("paymentNotes").value.trim();
-
+        document.getElementById(
+            "paymentNotes"
+        ).value.trim();
 
     if (!customerId) {
 
-        alert("Please select a customer.");
+        alert(
+            "Please select a customer."
+        );
 
         return;
 
     }
-
 
     if (!loanId) {
 
-        alert("Please select a loan.");
+        alert(
+            "Please select a loan."
+        );
 
         return;
 
     }
-
 
     if (amount <= 0) {
 
-        alert("Please enter a valid payment amount.");
+        alert(
+            "Please enter a valid payment amount."
+        );
 
         return;
 
     }
-
 
     if (!date) {
 
-        alert("Please select the payment date.");
+        alert(
+            "Please select the payment date."
+        );
 
         return;
 
     }
-
 
     if (!method) {
 
-        alert("Please select a payment method.");
+        alert(
+            "Please select a payment method."
+        );
 
         return;
 
     }
 
-
     let loans =
-        JSON.parse(localStorage.getItem("miccoLoans")) || [];
-
+        JSON.parse(
+            localStorage.getItem("miccoLoans")
+        ) || [];
 
     const loan =
         loans.find(
-            item => item.id === loanId
+            item =>
+                item.id === loanId
         );
-
 
     if (!loan) {
 
-        alert("Loan could not be found.");
+        alert(
+            "Loan could not be found."
+        );
 
         return;
 
     }
 
-
     const balance =
         getLoanBalance(loan);
-
 
     if (amount > balance) {
 
@@ -2188,13 +2627,11 @@ function savePayment() {
 
     }
 
-
     if (!loan.payments) {
 
         loan.payments = [];
 
     }
-
 
     loan.payments.push({
 
@@ -2210,27 +2647,36 @@ function savePayment() {
 
     });
 
-
     localStorage.setItem(
         "miccoLoans",
         JSON.stringify(loans)
     );
 
+    document.getElementById(
+        "paymentCustomer"
+    ).value = "";
 
-    document.getElementById("paymentCustomer").value = "";
-
-    document.getElementById("paymentLoan").innerHTML =
+    document.getElementById(
+        "paymentLoan"
+    ).innerHTML =
         '<option value="">Select Loan</option>';
 
-    document.getElementById("paymentAmount").value = "";
+    document.getElementById(
+        "paymentAmount"
+    ).value = "";
 
-    document.getElementById("paymentDate").value =
+    document.getElementById(
+        "paymentDate"
+    ).value =
         getToday();
 
-    document.getElementById("paymentMethod").value = "";
+    document.getElementById(
+        "paymentMethod"
+    ).value = "";
 
-    document.getElementById("paymentNotes").value = "";
-
+    document.getElementById(
+        "paymentNotes"
+    ).value = "";
 
     hidePaymentForm();
 
@@ -2240,12 +2686,15 @@ function savePayment() {
 
     displayReminders();
 
+    displayLoanHistory();
+
     updateDashboard();
 
     loadPaymentCustomers();
 
-
-    alert("Payment recorded successfully!");
+    alert(
+        "Payment recorded successfully!"
+    );
 
 }
 
@@ -2253,26 +2702,28 @@ function savePayment() {
 function displayPayments() {
 
     const loans =
-        JSON.parse(localStorage.getItem("miccoLoans")) || [];
-
+        JSON.parse(
+            localStorage.getItem("miccoLoans")
+        ) || [];
 
     const customers =
-        JSON.parse(localStorage.getItem("miccoCustomers")) || [];
-
+        JSON.parse(
+            localStorage.getItem("miccoCustomers")
+        ) || [];
 
     const tableBody =
-        document.getElementById("paymentTableBody");
-
+        document.getElementById(
+            "paymentTableBody"
+        );
 
     const section =
-        document.getElementById("paymentSection");
-
+        document.getElementById(
+            "paymentSection"
+        );
 
     tableBody.innerHTML = "";
 
-
     const payments = [];
-
 
     loans.forEach(loan => {
 
@@ -2282,12 +2733,12 @@ function displayPayments() {
 
         }
 
-
         const customer =
             customers.find(
-                c => c.id === loan.customerId
+                c =>
+                    c.id ===
+                    loan.customerId
             );
-
 
         loan.payments.forEach(payment => {
 
@@ -2316,46 +2767,54 @@ function displayPayments() {
 
     });
 
-
     payments.sort(
+
         (a,b) =>
             new Date(b.date) -
             new Date(a.date)
-    );
 
+    );
 
     if (payments.length === 0) {
 
-        section.style.display = "none";
+        section.style.display =
+            "none";
 
         return;
 
     }
 
-
-    section.style.display = "block";
-
+    section.style.display =
+        "block";
 
     payments.forEach(payment => {
 
         const row =
             document.createElement("tr");
 
-
         row.innerHTML = `
 
-            <td>${escapeHTML(payment.customer)}</td>
+            <td>
+                ${escapeHTML(payment.customer)}
+            </td>
 
-            <td>N$ ${formatMoney(payment.amount)}</td>
+            <td>
+                N$ ${formatMoney(payment.amount)}
+            </td>
 
-            <td>${formatDate(payment.date)}</td>
+            <td>
+                ${formatDate(payment.date)}
+            </td>
 
-            <td>${escapeHTML(payment.method)}</td>
+            <td>
+                ${escapeHTML(payment.method)}
+            </td>
 
-            <td>${escapeHTML(payment.notes || "-")}</td>
+            <td>
+                ${escapeHTML(payment.notes || "-")}
+            </td>
 
         `;
-
 
         tableBody.appendChild(row);
 
@@ -2373,15 +2832,14 @@ function showReminders() {
     hideAllForms();
 
     const section =
-        document.getElementById("reminderSection");
-
+        document.getElementById(
+            "reminderSection"
+        );
 
     section.style.display =
         "block";
 
-
     displayReminders();
-
 
     section.scrollIntoView({
         behavior: "smooth"
@@ -2393,32 +2851,33 @@ function showReminders() {
 function displayReminders() {
 
     const loans =
-        JSON.parse(localStorage.getItem("miccoLoans")) || [];
-
+        JSON.parse(
+            localStorage.getItem("miccoLoans")
+        ) || [];
 
     const customers =
-        JSON.parse(localStorage.getItem("miccoCustomers")) || [];
-
+        JSON.parse(
+            localStorage.getItem("miccoCustomers")
+        ) || [];
 
     const tableBody =
-        document.getElementById("reminderTableBody");
-
+        document.getElementById(
+            "reminderTableBody"
+        );
 
     const summary =
-        document.getElementById("reminderSummary");
-
+        document.getElementById(
+            "reminderSummary"
+        );
 
     tableBody.innerHTML = "";
 
-
     const reminders = [];
-
 
     loans.forEach(loan => {
 
         const balance =
             getLoanBalance(loan);
-
 
         if (balance <= 0) {
 
@@ -2426,33 +2885,33 @@ function displayReminders() {
 
         }
 
-
         const status =
             getLoanStatus(loan);
 
-
         if (
+
             status.label !== "Overdue" &&
+
             status.label !== "Due Soon"
+
         ) {
 
             return;
 
         }
 
-
         const customer =
             customers.find(
-                c => c.id === loan.customerId
+                c =>
+                    c.id ===
+                    loan.customerId
             );
-
 
         if (!customer) {
 
             return;
 
         }
-
 
         reminders.push({
 
@@ -2468,7 +2927,6 @@ function displayReminders() {
 
     });
 
-
     if (reminders.length === 0) {
 
         summary.textContent =
@@ -2478,18 +2936,19 @@ function displayReminders() {
 
     }
 
-
     const overdueCount =
         reminders.filter(
-            item => item.status.label === "Overdue"
+            item =>
+                item.status.label ===
+                "Overdue"
         ).length;
-
 
     const dueSoonCount =
         reminders.filter(
-            item => item.status.label === "Due Soon"
+            item =>
+                item.status.label ===
+                "Due Soon"
         ).length;
-
 
     summary.textContent =
         overdueCount +
@@ -2497,31 +2956,32 @@ function displayReminders() {
         dueSoonCount +
         " due soon";
 
+    reminders.sort(
 
-    reminders.sort((a,b) => {
+        (a,b) =>
 
-        return (
             new Date(a.loan.dueDate) -
             new Date(b.loan.dueDate)
-        );
 
-    });
-
+    );
 
     reminders.forEach(item => {
 
         const row =
             document.createElement("tr");
 
-
         row.innerHTML = `
 
             <td>
-                ${escapeHTML(item.customer.name)}
+                ${escapeHTML(
+                    item.customer.name
+                )}
             </td>
 
             <td>
-                ${escapeHTML(item.customer.contact || "-")}
+                ${escapeHTML(
+                    item.customer.contact || "-"
+                )}
             </td>
 
             <td>
@@ -2529,7 +2989,9 @@ function displayReminders() {
             </td>
 
             <td>
-                ${formatDate(item.loan.dueDate)}
+                ${formatDate(
+                    item.loan.dueDate
+                )}
             </td>
 
             <td>
@@ -2557,7 +3019,6 @@ function displayReminders() {
 
         `;
 
-
         tableBody.appendChild(row);
 
     });
@@ -2565,36 +3026,46 @@ function displayReminders() {
 }
 
 
-function sendWhatsAppReminder(customerId, loanId) {
+function sendWhatsAppReminder(
+    customerId,
+    loanId
+) {
 
     const customers =
-        JSON.parse(localStorage.getItem("miccoCustomers")) || [];
-
+        JSON.parse(
+            localStorage.getItem(
+                "miccoCustomers"
+            )
+        ) || [];
 
     const loans =
-        JSON.parse(localStorage.getItem("miccoLoans")) || [];
-
+        JSON.parse(
+            localStorage.getItem(
+                "miccoLoans"
+            )
+        ) || [];
 
     const customer =
         customers.find(
-            c => c.id === customerId
+            c =>
+                c.id === customerId
         );
-
 
     const loan =
         loans.find(
-            l => l.id === loanId
+            l =>
+                l.id === loanId
         );
-
 
     if (!customer || !loan) {
 
-        alert("Customer or loan not found.");
+        alert(
+            "Customer or loan not found."
+        );
 
         return;
 
     }
-
 
     if (!customer.contact) {
 
@@ -2606,14 +3077,11 @@ function sendWhatsAppReminder(customerId, loanId) {
 
     }
 
-
     const balance =
         getLoanBalance(loan);
 
-
     const status =
         getLoanStatus(loan);
-
 
     const message =
 
@@ -2633,10 +3101,11 @@ function sendWhatsAppReminder(customerId, loanId) {
 
         "Please contact us if you have already made the payment. Thank you.";
 
-
     let phone =
-        customer.contact.replace(/\D/g, "");
-
+        customer.contact.replace(
+            /\D/g,
+            ""
+        );
 
     if (
         phone.startsWith("0") &&
@@ -2649,18 +3118,473 @@ function sendWhatsAppReminder(customerId, loanId) {
 
     }
 
-
     const url =
         "https://wa.me/" +
         phone +
         "?text=" +
-        encodeURIComponent(message);
-
+        encodeURIComponent(
+            message
+        );
 
     window.open(
         url,
         "_blank"
     );
+
+}
+
+
+/* =========================
+LOAN HISTORY
+========================= */
+
+function showLoanHistory() {
+
+    hideAllForms();
+
+    document.getElementById(
+        "reminderSection"
+    ).style.display = "none";
+
+    document.getElementById(
+        "customerSection"
+    ).style.display = "none";
+
+    document.getElementById(
+        "loanSection"
+    ).style.display = "none";
+
+    document.getElementById(
+        "paymentSection"
+    ).style.display = "none";
+
+    const section =
+        document.getElementById(
+            "historySection"
+        );
+
+    section.style.display =
+        "block";
+
+    setupHistoryYears();
+
+    displayLoanHistory();
+
+    section.scrollIntoView({
+        behavior: "smooth"
+    });
+
+}
+
+
+function setupHistoryYears() {
+
+    const select =
+        document.getElementById(
+            "historyYear"
+        );
+
+    const loans =
+        JSON.parse(
+            localStorage.getItem(
+                "miccoLoans"
+            )
+        ) || [];
+
+    const currentYear =
+        new Date().getFullYear();
+
+    const years = new Set();
+
+    years.add(currentYear);
+
+    loans.forEach(loan => {
+
+        if (loan.issueDate) {
+
+            const year =
+                Number(
+                    loan.issueDate.substring(
+                        0,
+                        4
+                    )
+                );
+
+            if (year) {
+
+                years.add(year);
+
+            }
+
+        }
+
+    });
+
+    const sortedYears =
+        Array.from(years).sort(
+            (a,b) => b - a
+        );
+
+    const oldValue =
+        select.value;
+
+    select.innerHTML = "";
+
+    sortedYears.forEach(year => {
+
+        const option =
+            document.createElement(
+                "option"
+            );
+
+        option.value =
+            year;
+
+        option.textContent =
+            year;
+
+        select.appendChild(option);
+
+    });
+
+    if (
+        sortedYears.includes(
+            Number(oldValue)
+        )
+    ) {
+
+        select.value =
+            oldValue;
+
+    }
+    else {
+
+        select.value =
+            currentYear;
+
+    }
+
+}
+
+
+function displayLoanHistory() {
+
+    setupHistoryYears();
+
+    const year =
+        Number(
+            document.getElementById(
+                "historyYear"
+            ).value
+        );
+
+    const month =
+        Number(
+            document.getElementById(
+                "historyMonth"
+            ).value
+        );
+
+    const loans =
+        JSON.parse(
+            localStorage.getItem(
+                "miccoLoans"
+            )
+        ) || [];
+
+    const customers =
+        JSON.parse(
+            localStorage.getItem(
+                "miccoCustomers"
+            )
+        ) || [];
+
+    const filteredLoans =
+        loans.filter(loan => {
+
+            if (!loan.issueDate) {
+
+                return false;
+
+            }
+
+            const loanYear =
+                Number(
+                    loan.issueDate.substring(
+                        0,
+                        4
+                    )
+                );
+
+            const loanMonth =
+                Number(
+                    loan.issueDate.substring(
+                        5,
+                        7
+                    )
+                ) - 1;
+
+            return (
+                loanYear === year &&
+                loanMonth === month
+            );
+
+        });
+
+    filteredLoans.sort(
+
+        (a,b) =>
+            new Date(b.issueDate) -
+            new Date(a.issueDate)
+
+    );
+
+    let totalLent = 0;
+
+    let totalPaid = 0;
+
+    let totalOutstanding = 0;
+
+    filteredLoans.forEach(loan => {
+
+        totalLent +=
+            Number(loan.amount) || 0;
+
+        totalPaid +=
+            getLoanPayments(loan);
+
+        totalOutstanding +=
+            getLoanBalance(loan);
+
+    });
+
+    document.getElementById(
+        "historyLoanCount"
+    ).textContent =
+        filteredLoans.length;
+
+    document.getElementById(
+        "historyTotalLent"
+    ).textContent =
+        "N$ " +
+        formatMoney(totalLent);
+
+    document.getElementById(
+        "historyTotalPaid"
+    ).textContent =
+        "N$ " +
+        formatMoney(totalPaid);
+
+    document.getElementById(
+        "historyOutstanding"
+    ).textContent =
+        "N$ " +
+        formatMoney(totalOutstanding);
+
+    const content =
+        document.getElementById(
+            "historyContent"
+        );
+
+    const monthName =
+        getMonthName(month);
+
+    if (filteredLoans.length === 0) {
+
+        content.innerHTML = `
+
+            <div class="no-history">
+
+                <h3 style="margin-bottom:8px;">
+                    No Loans Found
+                </h3>
+
+                <p>
+                    There are no loans recorded for
+                    ${monthName} ${year}.
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+    let rows = "";
+
+    filteredLoans.forEach(loan => {
+
+        const customer =
+            customers.find(
+                c =>
+                    c.id ===
+                    loan.customerId
+            );
+
+        const customerName =
+            customer
+                ? customer.name
+                : "Unknown";
+
+        const paid =
+            getLoanPayments(loan);
+
+        const balance =
+            getLoanBalance(loan);
+
+        const status =
+            getLoanStatus(loan);
+
+        rows += `
+
+            <tr>
+
+                <td>
+                    ${escapeHTML(
+                        customerName
+                    )}
+                </td>
+
+                <td>
+                    ${formatDate(
+                        loan.issueDate
+                    )}
+                </td>
+
+                <td>
+                    N$ ${formatMoney(
+                        loan.amount
+                    )}
+                </td>
+
+                <td>
+                    N$ ${formatMoney(
+                        loan.interest
+                    )}
+                </td>
+
+                <td>
+                    N$ ${formatMoney(
+                        loan.totalDue
+                    )}
+                </td>
+
+                <td>
+                    N$ ${formatMoney(
+                        paid
+                    )}
+                </td>
+
+                <td>
+                    N$ ${formatMoney(
+                        balance
+                    )}
+                </td>
+
+                <td>
+                    ${formatDate(
+                        loan.dueDate
+                    )}
+                </td>
+
+                <td>
+
+                    <span class="status ${status.className}">
+                        ${status.label}
+                    </span>
+
+                </td>
+
+            </tr>
+
+        `;
+
+    });
+
+    content.innerHTML = `
+
+        <h3 style="margin-bottom:10px;">
+            ${monthName} ${year} Loan History
+        </h3>
+
+        <div style="overflow-x:auto;">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Customer</th>
+
+                        <th>Issue Date</th>
+
+                        <th>Loan Amount</th>
+
+                        <th>Interest</th>
+
+                        <th>Total Due</th>
+
+                        <th>Paid</th>
+
+                        <th>Balance</th>
+
+                        <th>Due Date</th>
+
+                        <th>Status</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    ${rows}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    `;
+
+}
+
+
+function getMonthName(monthIndex) {
+
+    const months = [
+
+        "January",
+
+        "February",
+
+        "March",
+
+        "April",
+
+        "May",
+
+        "June",
+
+        "July",
+
+        "August",
+
+        "September",
+
+        "October",
+
+        "November",
+
+        "December"
+
+    ];
+
+    return months[monthIndex];
 
 }
 
@@ -2672,12 +3596,18 @@ DASHBOARD
 function updateDashboard() {
 
     const customers =
-        JSON.parse(localStorage.getItem("miccoCustomers")) || [];
-
+        JSON.parse(
+            localStorage.getItem(
+                "miccoCustomers"
+            )
+        ) || [];
 
     const loans =
-        JSON.parse(localStorage.getItem("miccoLoans")) || [];
-
+        JSON.parse(
+            localStorage.getItem(
+                "miccoLoans"
+            )
+        ) || [];
 
     let totalLent = 0;
 
@@ -2693,48 +3623,53 @@ function updateDashboard() {
 
     let overdue = 0;
 
-
     loans.forEach(loan => {
 
         const payments =
             getLoanPayments(loan);
 
-
         const balance =
             getLoanBalance(loan);
-
 
         totalLent +=
             Number(loan.amount);
 
-
         totalCollected +=
             payments;
-
 
         outstanding +=
             balance;
 
-
         const status =
             getLoanStatus(loan);
 
-
-        if (status.label === "Overdue") {
+        if (
+            status.label ===
+            "Overdue"
+        ) {
 
             overdue++;
 
-            overdueAmount += balance;
+            overdueAmount +=
+                balance;
 
         }
-        else if (status.label === "Due Soon") {
+
+        else if (
+            status.label ===
+            "Due Soon"
+        ) {
 
             dueSoon++;
 
             active++;
 
         }
-        else if (status.label === "Active") {
+
+        else if (
+            status.label ===
+            "Active"
+        ) {
 
             active++;
 
@@ -2742,48 +3677,48 @@ function updateDashboard() {
 
     });
 
-
-    document.getElementById("totalLent")
-        .textContent =
+    document.getElementById(
+        "totalLent"
+    ).textContent =
         "N$ " +
         formatMoney(totalLent);
 
-
-    document.getElementById("totalCollected")
-        .textContent =
+    document.getElementById(
+        "totalCollected"
+    ).textContent =
         "N$ " +
         formatMoney(totalCollected);
 
-
-    document.getElementById("outstanding")
-        .textContent =
+    document.getElementById(
+        "outstanding"
+    ).textContent =
         "N$ " +
         formatMoney(outstanding);
 
-
-    document.getElementById("overdueAmount")
-        .textContent =
+    document.getElementById(
+        "overdueAmount"
+    ).textContent =
         "N$ " +
         formatMoney(overdueAmount);
 
-
-    document.getElementById("customerCount")
-        .textContent =
+    document.getElementById(
+        "customerCount"
+    ).textContent =
         customers.length;
 
-
-    document.getElementById("activeLoans")
-        .textContent =
+    document.getElementById(
+        "activeLoans"
+    ).textContent =
         active;
 
-
-    document.getElementById("dueSoon")
-        .textContent =
+    document.getElementById(
+        "dueSoon"
+    ).textContent =
         dueSoon;
 
-
-    document.getElementById("overdueLoans")
-        .textContent =
+    document.getElementById(
+        "overdueLoans"
+    ).textContent =
         overdue;
 
 }
@@ -2795,13 +3730,19 @@ UTILITIES
 
 function hideAllForms() {
 
-    document.getElementById("customerForm").style.display =
+    document.getElementById(
+        "customerForm"
+    ).style.display =
         "none";
 
-    document.getElementById("loanForm").style.display =
+    document.getElementById(
+        "loanForm"
+    ).style.display =
         "none";
 
-    document.getElementById("paymentForm").style.display =
+    document.getElementById(
+        "paymentForm"
+    ).style.display =
         "none";
 
 }
@@ -2814,7 +3755,8 @@ function scrollToForm(id) {
         window.scrollTo({
 
             top:
-                document.getElementById(id).offsetTop - 20,
+                document.getElementById(id)
+                    .offsetTop - 20,
 
             behavior: "smooth"
 
@@ -2830,29 +3772,33 @@ function getToday() {
     const today =
         new Date();
 
-
     const year =
         today.getFullYear();
-
 
     const month =
         String(
             today.getMonth() + 1
-        ).padStart(2, "0");
-
+        ).padStart(
+            2,
+            "0"
+        );
 
     const day =
         String(
             today.getDate()
-        ).padStart(2, "0");
-
+        ).padStart(
+            2,
+            "0"
+        );
 
     return (
+
         year +
         "-" +
         month +
         "-" +
         day
+
     );
 
 }
@@ -2860,12 +3806,20 @@ function getToday() {
 
 function formatMoney(amount) {
 
-    return Number(amount).toLocaleString(
+    return Number(
+        amount
+    ).toLocaleString(
+
         "en-NA",
+
         {
+
             minimumFractionDigits: 2,
+
             maximumFractionDigits: 2
+
         }
+
     );
 
 }
@@ -2879,17 +3833,17 @@ function formatDate(dateString) {
 
     }
 
-
     const parts =
         dateString.split("-");
 
-
     return (
+
         parts[2] +
         "/" +
         parts[1] +
         "/" +
         parts[0]
+
     );
 
 }
@@ -2898,12 +3852,12 @@ function formatDate(dateString) {
 function escapeHTML(text) {
 
     const div =
-        document.createElement("div");
-
+        document.createElement(
+            "div"
+        );
 
     div.textContent =
         text;
-
 
     return div.innerHTML;
 
@@ -2929,9 +3883,12 @@ displayReminders();
 updateDashboard();
 
 calculateTotal();
+
+setupHistoryYears();
+
 checkLogin();
 
-
 </script>
+
 </body>
 </html>
