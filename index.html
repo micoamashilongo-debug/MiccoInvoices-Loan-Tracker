@@ -108,9 +108,63 @@ header p {
 
 .actions {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 12px;
     margin-bottom: 25px;
+}
+
+.workflow-note {
+    background: #eef2ff;
+    border: 1px solid #c7d2fe;
+    color: #1e3a8a;
+    padding: 14px 16px;
+    border-radius: 10px;
+    margin-bottom: 18px;
+    line-height: 1.5;
+}
+
+.calculator-section {
+    display: none;
+    background: white;
+    border-radius: 12px;
+    padding: 22px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    max-width: 420px;
+}
+
+.calculator-display {
+    width: 100%;
+    padding: 16px 12px;
+    margin: 14px 0;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: #f9fafb;
+    text-align: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.calculator-keys {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.calculator-keys button {
+    min-height: 52px;
+    padding: 10px;
+    font-size: 18px;
+}
+
+.calculator-keys .calc-clear { background: #b91c1c; }
+.calculator-keys .calc-equals { background: #166534; }
+.calculator-keys .calc-operator { background: #374151; }
+
+.history-export-row {
+    display: flex;
+    justify-content: flex-end;
+    margin: 0 0 18px;
 }
 
 button {
@@ -595,21 +649,32 @@ OVERDUE
 <!-- QUICK ACTIONS -->
 
 <h2 class="section-title">
+HOW TO USE THE LOAN TRACKER
+</h2>
+
+<div class="workflow-note">
+<strong>Follow these three steps:</strong><br>
+<strong>Step 1:</strong> Add the customer's details.<br>
+<strong>Step 2:</strong> Add a loan for that customer and enter the loan amount and dates.<br>
+<strong>Step 3:</strong> Record payments whenever the customer pays you.
+</div>
+
+<h2 class="section-title">
 QUICK ACTIONS
 </h2>
 
 <div class="actions">
 
 <button onclick="showCustomerForm()">
-+ Add Customer
+Step 1: Add Customer
 </button>
 
 <button onclick="showLoanForm()">
-+ Add Loan
+Step 2: Add Loan
 </button>
 
 <button onclick="showPaymentForm()">
-Record Payment
+Step 3: Record Payment
 </button>
 
 <button onclick="showReminders()">
@@ -620,8 +685,41 @@ Record Payment
 📅 Loan History
 </button>
 
+<button onclick="showCalculator()">
+🧮 Calculator
+</button>
+
 </div>
 
+<!-- BASIC CALCULATOR -->
+<div class="calculator-section" id="calculatorSection">
+    <h2>Calculator</h2>
+    <p style="color:#6b7280; margin-top:6px;">Use this calculator for quick loan or payment calculations.</p>
+    <input class="calculator-display" id="calculatorDisplay" type="text" value="0" aria-label="Calculator display" readonly>
+    <div class="calculator-keys">
+        <button type="button" class="calc-clear" onclick="calculatorClear()">C</button>
+        <button type="button" onclick="calculatorBackspace()">⌫</button>
+        <button type="button" class="calc-operator" onclick="calculatorInput('%')">%</button>
+        <button type="button" class="calc-operator" onclick="calculatorInput('/')">÷</button>
+        <button type="button" onclick="calculatorInput('7')">7</button>
+        <button type="button" onclick="calculatorInput('8')">8</button>
+        <button type="button" onclick="calculatorInput('9')">9</button>
+        <button type="button" class="calc-operator" onclick="calculatorInput('*')">×</button>
+        <button type="button" onclick="calculatorInput('4')">4</button>
+        <button type="button" onclick="calculatorInput('5')">5</button>
+        <button type="button" onclick="calculatorInput('6')">6</button>
+        <button type="button" class="calc-operator" onclick="calculatorInput('-')">−</button>
+        <button type="button" onclick="calculatorInput('1')">1</button>
+        <button type="button" onclick="calculatorInput('2')">2</button>
+        <button type="button" onclick="calculatorInput('3')">3</button>
+        <button type="button" class="calc-operator" onclick="calculatorInput('+')">+</button>
+        <button type="button" onclick="calculatorInput('0')">0</button>
+        <button type="button" onclick="calculatorInput('.')">.</button>
+        <button type="button" onclick="calculatorToggleSign()">±</button>
+        <button type="button" class="calc-equals" onclick="calculatorCalculate()">=</button>
+    </div>
+    <button type="button" class="cancel-btn" style="margin-top:12px; width:100%;" onclick="hideCalculator()">Close Calculator</button>
+</div>
 
 <!-- CUSTOMER FORM -->
 
@@ -1257,6 +1355,9 @@ December
 
 </div>
 
+<div class="history-export-row">
+<button type="button" onclick="printLoanHistoryPDF()">Download Monthly PDF</button>
+</div>
 
 <div class="history-summary">
 
@@ -1510,6 +1611,7 @@ CUSTOMERS
 ========================= */
 
 function showCustomerForm() {
+    hideCalculator();
 
     hideAllForms();
 
@@ -1742,6 +1844,7 @@ LOANS
 ========================= */
 
 function showLoanForm() {
+    hideCalculator();
 
     const customers =
         JSON.parse(
@@ -2237,6 +2340,7 @@ PAYMENTS
 ========================= */
 
 function showPaymentForm() {
+    hideCalculator();
 
     const loans =
         JSON.parse(
@@ -3135,6 +3239,95 @@ function sendWhatsAppReminder(
 
 
 /* =========================
+BASIC CALCULATOR
+========================= */
+
+let calculatorExpression = "";
+let calculatorJustCalculated = false;
+
+function showCalculator() {
+    hideAllForms();
+    ["customerSection", "loanSection", "paymentSection", "reminderSection", "historySection"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = "none";
+    });
+    document.getElementById("calculatorSection").style.display = "block";
+    document.getElementById("calculatorSection").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function hideCalculator() {
+    const el = document.getElementById("calculatorSection");
+    if (el) el.style.display = "none";
+}
+
+function calculatorInput(value) {
+    const display = document.getElementById("calculatorDisplay");
+    if (!display) return;
+    if (calculatorJustCalculated && /[0-9.]/.test(value)) calculatorExpression = "";
+    calculatorJustCalculated = false;
+    if (value === ".") {
+        const currentNumber = calculatorExpression.split(/[+\-*/%]/).pop();
+        if (currentNumber.includes(".")) return;
+        if (!currentNumber) calculatorExpression += "0";
+    }
+    if (/^[+*/%]$/.test(value) && !calculatorExpression) return;
+    if (/^[+*/%]$/.test(value) && /[+\-*/%]$/.test(calculatorExpression)) {
+        calculatorExpression = calculatorExpression.slice(0, -1);
+    }
+    calculatorExpression += value;
+    display.value = calculatorExpression || "0";
+}
+
+function calculatorClear() {
+    calculatorExpression = "";
+    calculatorJustCalculated = false;
+    document.getElementById("calculatorDisplay").value = "0";
+}
+
+function calculatorBackspace() {
+    calculatorExpression = calculatorExpression.slice(0, -1);
+    calculatorJustCalculated = false;
+    document.getElementById("calculatorDisplay").value = calculatorExpression || "0";
+}
+
+function calculatorToggleSign() {
+    if (!calculatorExpression) return;
+    const match = calculatorExpression.match(/(\d*\.?\d+)$/);
+    if (!match) return;
+    const number = match[1];
+    const start = match.index;
+    const hasMinus = start > 0 && calculatorExpression[start - 1] === "-" &&
+        (start - 1 === 0 || /[+*/%]/.test(calculatorExpression[start - 2]));
+    calculatorExpression = calculatorExpression.slice(0, hasMinus ? start - 1 : start) +
+        (hasMinus ? "" : "-") + number;
+    document.getElementById("calculatorDisplay").value = calculatorExpression;
+}
+
+function calculatorCalculate() {
+    const display = document.getElementById("calculatorDisplay");
+    if (!calculatorExpression) return;
+    if (!/^[0-9+*/%.\-() ]+$/.test(calculatorExpression) || /[+*/%.\-]$/.test(calculatorExpression)) {
+        display.value = "Error";
+        calculatorExpression = "";
+        calculatorJustCalculated = true;
+        return;
+    }
+    try {
+        // Evaluate only a validated arithmetic expression made from calculator button input.
+        const result = Function('"use strict"; return (' + calculatorExpression + ')')();
+        if (!Number.isFinite(result)) throw new Error("Invalid calculation");
+        calculatorExpression = String(Number(result.toFixed(8)));
+        display.value = calculatorExpression;
+        calculatorJustCalculated = true;
+    } catch (e) {
+        display.value = "Error";
+        calculatorExpression = "";
+        calculatorJustCalculated = true;
+    }
+}
+
+
+/* =========================
 LOAN HISTORY
 ========================= */
 
@@ -3554,6 +3747,38 @@ function displayLoanHistory() {
 }
 
 
+function printLoanHistoryPDF() {
+    const year = Number(document.getElementById("historyYear").value);
+    const month = Number(document.getElementById("historyMonth").value);
+    const loans = JSON.parse(localStorage.getItem("miccoLoans") || "[]");
+    const customers = JSON.parse(localStorage.getItem("miccoCustomers") || "[]");
+    const filteredLoans = loans.filter(loan => {
+        if (!loan.issueDate) return false;
+        const d = new Date(loan.issueDate + "T00:00:00");
+        return d.getFullYear() === year && d.getMonth() === month;
+    }).sort((a, b) => new Date(a.issueDate) - new Date(b.issueDate));
+
+    const monthName = getMonthName(month);
+    const totalLent = filteredLoans.reduce((sum, loan) => sum + (Number(loan.amount) || 0), 0);
+    const rows = filteredLoans.map(loan => {
+        const customer = customers.find(c => c.id === loan.customerId);
+        const name = customer ? customer.name : "Unknown customer";
+        return `<tr><td>${escapeHTML(name)}</td><td>N$ ${formatMoney(loan.amount)}</td></tr>`;
+    }).join("");
+
+    const printWindow = window.open("", "_blank");
+    if (!printWindow) {
+        alert("Please allow pop-ups for this site to create the PDF.");
+        return;
+    }
+    printWindow.document.open();
+    printWindow.document.write(`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><title>${monthName} ${year} Loan History</title><style>
+        body{font-family:Arial,sans-serif;color:#111827;padding:28px}h1{font-size:22px;margin-bottom:6px}p{margin:6px 0 18px;color:#4b5563}table{width:100%;border-collapse:collapse;margin-top:18px}th,td{padding:10px;text-align:left;border:1px solid #d1d5db}th{background:#f3f4f6}.total{margin-top:20px;font-size:18px;font-weight:bold}.empty{padding:18px 0}@media print{button{display:none}}
+        </style></head><body><h1>MICCOINVOICES LOAN TRACKER</h1><h2>${monthName} ${year} Loan History</h2><p>This report lists the customer names and loan amounts issued during the selected month.</p>${filteredLoans.length ? `<table><thead><tr><th>Customer Name</th><th>Loan Amount</th></tr></thead><tbody>${rows}</tbody></table>` : `<p class="empty">No loans recorded for ${monthName} ${year}.</p>`}<div class="total">Total lent for ${monthName} ${year}: N$ ${formatMoney(totalLent)}</div><script>window.onload=function(){window.focus();window.print();};<\/script></body></html>`);
+    printWindow.document.close();
+}
+
+
 function getMonthName(monthIndex) {
 
     const months = [
@@ -3885,6 +4110,9 @@ updateDashboard();
 calculateTotal();
 
 setupHistoryYears();
+
+const historyMonthSelect = document.getElementById("historyMonth");
+if (historyMonthSelect) historyMonthSelect.value = String(new Date().getMonth());
 
 checkLogin();
 
